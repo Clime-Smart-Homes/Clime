@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "Library")(type "KiCad")(uri "${KIPRJMOD}/Library.pretty")(options "")(descr ""))
+  (lib (name "clime_components")(type "KiCad")(uri "${KIPRJMOD}/clime_components.pretty")(options "")(descr ""))
+)

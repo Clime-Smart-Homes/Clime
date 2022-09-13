@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "motor_faucet")(type "KiCad")(uri "${KIPRJMOD}/motor_faucet.kicad_sym")(options "")(descr ""))
+  (lib (name "clime_symbols")(type "KiCad")(uri "${KIPRJMOD}/clime_symbols.kicad_sym")(options "")(descr ""))
+)
