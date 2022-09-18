@@ -1,2 +1,3 @@
 # Ignore backup CAD files
 pcb/faucet/faucet/faucet-backups/
+pcb/faucet/faucet/gerbers/
