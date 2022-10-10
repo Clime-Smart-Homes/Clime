@@ -16,6 +16,17 @@ MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
 # Represent the 8 age classes of this CNN probability layer
 AGE_INTERVALS = ['(0, 2)', '(4, 6)', '(8, 12)', '(15, 20)',
                  '(25, 32)', '(38, 43)', '(48, 53)', '(60, 100)']
+
+AGE_TRUST = {
+    '(0, 2)':    '15',
+    '(4, 6)':    '25',
+    '(8, 12)':   '35', 
+    '(15, 20)':  '65',
+    '(25, 32)':  '85',
+    '(38, 43)':  '100',
+    '(48, 53)':  '100', 
+    '(60, 100)': '100',
+        }
 # download from: https://raw.githubusercontent.com/opencv/opencv/master/samples/dnn/face_detector/deploy.prototxt
 FACE_PROTO = "weights/deploy.prototxt.txt"
 # download from: https://raw.githubusercontent.com/opencv/opencv_3rdparty/dnn_samples_face_detector_20180205_fp16/res10_300x300_ssd_iter_140000_fp16.caffemodel
@@ -110,7 +121,11 @@ def predict_age():
         frame = img.copy()
         if frame.shape[1] > frame_width:
             frame = image_resize(frame, width=frame_width)
-        faces = get_faces(frame)
+        faces = get_faces(frame) # TODO: Determine order of faces for polishing.
+
+        if len(faces) == 0:
+            self.trust_factor = 0
+
         for i, (start_x, start_y, end_x, end_y) in enumerate(faces):
             face_img = frame[start_y: end_y, start_x: end_x]
             # image --> Input image to preprocess before passing it through our dnn for classification.
@@ -130,6 +145,8 @@ def predict_age():
             # Draw the box
             label = f"Age:{age} - {age_confidence_score*100:.2f}%"
             print(label)
+            print("trust factor: " + AGE_TRUST[age])
+
             # get the position where to put the text
             yPos = start_y - 15
             while yPos < 15:
@@ -139,6 +156,7 @@ def predict_age():
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), thickness=2)
             # draw the rectangle around the face
             cv2.rectangle(frame, (start_x, start_y), (end_x, end_y), color=(255, 0, 0), thickness=2)
+
         # Display processed image
         cv2.imshow('Age Estimator', frame)
         if cv2.waitKey(1) == ord("q"):

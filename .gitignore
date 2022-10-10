@@ -1,3 +1,8 @@
 # Ignore backup CAD files
 pcb/faucet/faucet/faucet-backups/
 pcb/faucet/faucet/gerbers/
+controller/server.py
+venv/lib
+venv/lib64
+.idea
+*pycache*

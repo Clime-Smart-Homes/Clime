@@ -1,5 +1,3 @@
-import pyControl4
-
 from pyControl4.account import C4Account
 from pyControl4.director import C4Director
 from pyControl4.light import C4Light
@@ -13,7 +11,7 @@ from time import sleep
 username = ""
 password = ""
 
-ip = ""
+ip = "192.168.0.13"
 
 """Authenticate with Control4 account"""
 account = C4Account(username, password)
@@ -32,7 +30,7 @@ director_bearer_token = asyncio.run(
 director = C4Director(ip, director_bearer_token)
 
 """Create new C4Light instance, put your own device for the ID"""
-light = C4Light(director, 0)
+light = C4Light(director, 31)
 
 s=socket.socket()
 host = socket.gethostname()
