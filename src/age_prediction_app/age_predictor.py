@@ -1,16 +1,16 @@
 import cv2
 import numpy as np
-
+from model.user import User
 
 class AgePredictor:
     def __init__(self):
 
         # The model architecture
         # download from: https://drive.google.com/open?id=1kiusFljZc9QfcIYdU2s7xrtWHTraHwmW
-        age_model = 'weights/deploy_age.prototxt'
+        age_model = 'age_prediction_app/weights/deploy_age.prototxt'
         # Thedel pre-trained weights
         # download from: https://drive.google.com/open?id=1kWv0AjxGSN0g31OeJa02eBGM0R_jcjIl
-        age_proto = 'weights/age_net.caffemodel'
+        age_proto = 'age_prediction_app/weights/age_net.caffemodel'
         # Each Caffe Model impose the shape of the input image also image preprocessing is required like mean
         # substraction to eliminate the effect of illunination changes
         self.model_mean_values = (78.4263377603, 87.7689143744, 114.895847746)
@@ -29,9 +29,9 @@ class AgePredictor:
             '(60, 100)': 35
         }
         # download from: https://raw.githubusercontent.com/opencv/opencv/master/samples/dnn/face_detector/deploy.prototxt
-        face_proto = "weights/deploy.prototxt.txt"
+        face_proto = "age_prediction_app/weights/deploy.prototxt.txt"
         # download from: https://raw.githubusercontent.com/opencv/opencv_3rdparty/dnn_samples_face_detector_20180205_fp16/res10_300x300_ssd_iter_140000_fp16.caffemodel
-        face_model = "weights/res10_300x300_ssd_iter_140000_fp16.caffemodel"
+        face_model = "age_prediction_app/weights/res10_300x300_ssd_iter_140000_fp16.caffemodel"
 
         # Initialize frame size
         self.frame_width = 1280
@@ -109,8 +109,10 @@ class AgePredictor:
         if len(faces) == 0:
             return None, None, None
 
-        user = faces[0]
-        face_img = frame[user[1]: user[3], user[0]: user[2]]
+        (start_x, start_y, end_x, end_y) = faces[0]
+        user = User(start_x, start_y, end_x, end_y)
+        
+        face_img = frame[user.start_y: user.end_y, user.start_x: user.end_x]
 
         # image --> Input image to preprocess before passing it through our dnn for classification.
         blob = cv2.dnn.blobFromImage(
