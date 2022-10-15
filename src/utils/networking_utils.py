@@ -1,7 +1,8 @@
+import asyncio
 from pyControl4.account import C4Account
 from pyControl4.director import C4Director
 from pyControl4.light import C4Light
-import asyncio
+
 
 class C4Network:
     def __init__(self):
@@ -31,4 +32,4 @@ class C4Network:
         self.light = C4Light(director, 31)
 
     def send_value(self, value):
-        asyncio.to_thread(self.light.rampToLevel(value, 100))
+        asyncio.run(self.light.rampToLevel(value, 100))
