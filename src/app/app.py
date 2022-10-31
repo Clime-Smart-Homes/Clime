@@ -20,10 +20,14 @@ def process_images():
         if frame.shape[1] > model.frame_width:
             frame = image_resize(frame, width=model.frame_width)  # TODO create image manipulation utils module
 
-        user, value, pred_confidence = model.predict(frame)
+        user, value, pred_confidence, reset_confidence = model.predict(frame)
 
         label = "Controller Value: " + str(value) + " -- Output value: " + str(output)
         print(label)
+
+        if reset_confidence:
+            confidence -= 10
+            output -= 5
 
         # Slowly decrease confidence and output value if user is not found
         if user is None:

@@ -32,6 +32,9 @@ class EmotionCameraModel:
             'surprise',
             'neutral'
         ]
+
+        self.last_emotion = ""
+        self.reset_confidence = False
         # download from: https://raw.githubusercontent.com/opencv/opencv/master/samples/dnn/face_detector/deploy.prototxt
         face_proto = "model/machine_learning/age_prediction/weights/deploy.prototxt.txt"
         # download from: https://raw.githubusercontent.com/opencv/opencv_3rdparty/dnn_samples_face_detector_20180205_fp16/res10_300x300_ssd_iter_140000_fp16.caffemodel
@@ -98,7 +101,7 @@ class EmotionCameraModel:
     def predict(self, frame):
         faces = self.get_faces(frame)  # TODO: Determine order of faces for polishing
         if len(faces) == 0:
-            return None, None, None
+            return None, None, None, None
 
         (start_x, start_y, end_x, end_y) = faces[0]
         user = User(start_x, start_y, end_x, end_y)
@@ -113,13 +116,21 @@ class EmotionCameraModel:
         # Predict emotion
         prediction = self.model.predict(cropped_img)
         
-        print(prediction)
         maxindex = int(np.argmax(prediction))
-        emotion_detected = self.emotion_dict[max_index]
+        emotion_detected = self.emotion_dict[maxindex]
+
+        if emotion_detected != self.last_emotion and self.last_emotion != "":
+            self.reset_confidence = True
+
+        else:
+            self.reset_confidence = False
+
+        self.last_emotion = emotion_detected
+
         print("Emotion detected: " + emotion_detected)
         cv2.putText(frame, emotion_detected, (user.start_x+20, user.start_y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
         output_value = self.emotion_scores[emotion_detected]
-        confidence_score = prediction[maxindex] * 100
+        confidence_score = prediction[0][maxindex] * 100
 
-        return user, output_value, confidence_score
+        return user, output_value, confidence_score, self.reset_confidence
