@@ -9,10 +9,10 @@ class AgeCameraModel:
 
         # The model architecture
         # download from: https://drive.google.com/open?id=1kiusFljZc9QfcIYdU2s7xrtWHTraHwmW
-        age_model = 'model/machine_learning/age_prediction/weights/deploy_age.prototxt'
+        age_proto = 'model/machine_learning/age_prediction/weights/deploy_age.prototxt'
         # Thedel pre-trained weights
         # download from: https://drive.google.com/open?id=1kWv0AjxGSN0g31OeJa02eBGM0R_jcjIl
-        age_proto = 'model/machine_learning/age_prediction/weights/age_net.caffemodel'
+        age_model = 'model/machine_learning/age_prediction/weights/age_net.caffemodel'
         # Each Caffe Model impose the shape of the input image also image preprocessing is required like mean
         # substraction to eliminate the effect of illunination changes
         self.model_mean_values = (78.4263377603, 87.7689143744, 114.895847746)
@@ -42,7 +42,7 @@ class AgeCameraModel:
         # load face Caffe model
         self.face_net = cv2.dnn.readNetFromCaffe(face_proto, face_model)
         # Load age prediction model
-        self.age_net = cv2.dnn.readNetFromCaffe(age_model, age_proto)
+        self.age_net = cv2.dnn.readNetFromCaffe(age_proto, age_model)
 
     def get_faces(self, frame, confidence_threshold=0.5):
         """Returns the box coordinates of all detected faces"""
@@ -72,7 +72,7 @@ class AgeCameraModel:
                 faces.append((start_x, start_y, end_x, end_y))
         return faces
 
-    def predict_age(self, frame):
+    def predict(self, frame):
         faces = self.get_faces(frame)  # TODO: Determine order of faces for polishing
         if len(faces) == 0:
             return None, None, None

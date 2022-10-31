@@ -1,16 +1,27 @@
 import cv2
 import numpy as np
+from keras.models import model_from_json
+from keras.models import Sequential
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import MaxPooling2D
+from tensorflow.keras.layers import Dense, Dropout, Flatten
 
 from model.domain.user import User
 
 
+# Emotion model source:
+# https://github.com/atulapra/Emotion-detection
 class EmotionCameraModel:
     def __init__(self):
 
         # Each Caffe Model impose the shape of the input image also image preprocessing is required like mean
         # substraction to eliminate the effect of illunination changes
-        self.model_mean_values = (78.4263377603, 87.7689143744, 114.895847746)
+        # self.model_mean_values = (78.4263377603, 87.7689143744, 114.895847746)
         # Represent the 8 age classes of this CNN probability layer
+
+        self.emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
+
+        self.emotion_scores = {"Angry": 0, "Disgusted": 50, "Fearful": 25, "Happy": 100, "Neutral": 75, "Sad": 0, "Surprised": 100}
 
         self.emotions_text = [
             'angry',
@@ -30,12 +41,31 @@ class EmotionCameraModel:
         self.frame_width = 1280
         self.frame_height = 720
 
-        emotion_proto = "model/machine_learning/emotion_prediction/weights/emotion_miniXception.prototxt.txt"
-        emotion_model = "model/machine_learning/emotion_prediction/weights/emotion_miniXception.caffemodel"
+        emotion_proto = "model/machine_learning/emotion_prediction/weights/haarcascade_frontalface_default.xml"
+        emotion_model = "model/machine_learning/emotion_prediction/weights/model.h5"
         # load face Caffe model
         self.face_net = cv2.dnn.readNetFromCaffe(face_proto, face_model)
         # Load emotion prediction model
-        self.emotion_net = cv2.dnn.readNet(emotion_proto, emotion_model)
+        # self.emotion_net = cv2.dnn.readNetFromCaffe(emotion_proto, emotion_model)
+        self.model = Sequential()
+
+        self.model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))
+        self.model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+        self.model.add(MaxPooling2D(pool_size=(2, 2)))
+        self.model.add(Dropout(0.25))
+
+        self.model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+        self.model.add(MaxPooling2D(pool_size=(2, 2)))
+        self.model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+        self.model.add(MaxPooling2D(pool_size=(2, 2)))
+        self.model.add(Dropout(0.25))
+
+        self.model.add(Flatten())
+        self.model.add(Dense(1024, activation='relu'))
+        self.model.add(Dropout(0.5))
+        self.model.add(Dense(7, activation='softmax'))
+
+        self.model.load_weights(emotion_model)
 
     def get_faces(self, frame, confidence_threshold=0.5):
         """Returns the box coordinates of all detected faces"""
@@ -65,7 +95,7 @@ class EmotionCameraModel:
                 faces.append((start_x, start_y, end_x, end_y))
         return faces
 
-    def predict_age(self, frame):
+    def predict(self, frame):
         faces = self.get_faces(frame)  # TODO: Determine order of faces for polishing
         if len(faces) == 0:
             return None, None, None
@@ -79,24 +109,17 @@ class EmotionCameraModel:
 
         face_img = cv2.cvtColor(face_img,cv2.COLOR_BGR2GRAY)
         # image --> Input image to preprocess before passing it through our dnn for classification.
-        blob = cv2.dnn.blobFromImage(
-            image=face_img, scalefactor=1.0, size=(64, 64),
-            swapRB=False
-        )
+        cropped_img = np.expand_dims(np.expand_dims(cv2.resize(face_img, (48, 48)), -1), 0)
         # Predict emotion
-        self.emotion_net.setInput(blob)
-        emotion_preds = self.emotion_net.forward()
-        print("=" * 30, "Emotion Prediction Probabilities", "=" * 30)
-        print(emotion_preds)
-        # for i in range(emotion_preds[0].shape[0]):
-            #print(f"{self.age_intervals[i]}: {age_preds[0, i] * 100:.2f}%")
-            # print(f"{emotion_preds[0, i] * 100:.2f}%")
-        i = emotion_preds.argmax()
-        print("i = " + str(i))
-        if i != 0 and i != 6:
-            print("WE DID IT, NTRO ANGRY AND NOT NETURAL")
-        print(self.emotions_text[i])
-        #age = self.age_intervals[i]
-        emotion_confidence_score = emotion_preds[0][i]
+        prediction = self.model.predict(cropped_img)
+        
+        print(prediction)
+        maxindex = int(np.argmax(prediction))
+        emotion_detected = self.emotion_dict[max_index]
+        print("Emotion detected: " + emotion_detected)
+        cv2.putText(frame, emotion_detected, (user.start_x+20, user.start_y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
-        return user, 10, emotion_confidence_score
+        output_value = self.emotion_scores[emotion_detected]
+        confidence_score = prediction[maxindex] * 100
+
+        return user, output_value, confidence_score

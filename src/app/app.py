@@ -20,7 +20,7 @@ def process_images():
         if frame.shape[1] > model.frame_width:
             frame = image_resize(frame, width=model.frame_width)  # TODO create image manipulation utils module
 
-        user, value, pred_confidence = model.predict_age(frame)
+        user, value, pred_confidence = model.predict(frame)
 
         label = "Controller Value: " + str(value) + " -- Output value: " + str(output)
         print(label)

@@ -4,5 +4,6 @@ pcb/faucet/faucet/gerbers/
 controller/server.py
 venv/lib
 venv/lib64
+venv/bin
 .idea
 *pycache*
