@@ -44,7 +44,16 @@ class AgeCameraModel:
         # Load age prediction model
         self.age_net = cv2.dnn.readNetFromCaffe(age_proto, age_model)
 
-    def get_faces(self, frame, confidence_threshold=0.5):
+        self.face_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+        self.face_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+
+        self.age_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+        self.age_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+
+    def get_model_type(self):
+        return 'age'
+
+    def get_largest_face(self, frame, confidence_threshold=0.5):
         """Returns the box coordinates of all detected faces"""
         # convert the frame into a blob to be ready for NN input
         blob = cv2.dnn.blobFromImage(frame, 1.0, (300, 300), (104, 177.0, 123.0))
@@ -53,7 +62,8 @@ class AgeCameraModel:
         # perform inference and get predictions
         output = np.squeeze(self.face_net.forward())
         # initialize the result list
-        faces = []
+        largest_face = None
+        max_area = 0
         # Loop over the faces detected
         for i in range(output.shape[0]):
             confidence = output[i, 2]
@@ -68,16 +78,26 @@ class AgeCameraModel:
                 start_y = 0 if start_y < 0 else start_y
                 end_x = 0 if end_x < 0 else end_x
                 end_y = 0 if end_y < 0 else end_y
-                # append to our list
-                faces.append((start_x, start_y, end_x, end_y))
-        return faces
+
+                print(f"x: ({start_x}, {end_x}), y: ({start_y}, {end_y})")
+
+                x = abs(end_x - start_x)
+                y = abs(end_y - start_y)
+
+                area = x * y
+
+                if area > max_area:
+                    largest_face = (start_x, start_y, end_x, end_y)
+                    max_area = area
+
+        return largest_face
 
     def predict(self, frame):
-        faces = self.get_faces(frame)  # TODO: Determine order of faces for polishing
-        if len(faces) == 0:
-            return None, None, None
+        face = self.get_largest_face(frame)
+        if face == None:
+            return None, None, None, None
 
-        (start_x, start_y, end_x, end_y) = faces[0]
+        (start_x, start_y, end_x, end_y) = face
         user = User(start_x, start_y, end_x, end_y)
 
         face_img = frame[user.start_y: user.end_y, user.start_x: user.end_x]
@@ -97,4 +117,4 @@ class AgeCameraModel:
         age = self.age_intervals[i]
         age_confidence_score = age_preds[0][i]
 
-        return user, self.age_trust[age], age_confidence_score
+        return user, self.age_trust[age], age_confidence_score, False

@@ -1,10 +1,14 @@
-import cv2
 import numpy as np
-from keras.models import model_from_json
-from keras.models import Sequential
+
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import MaxPooling2D
 from tensorflow.keras.layers import Dense, Dropout, Flatten
+
+from keras.models import model_from_json
+from keras.models import Sequential
+
+import cv2
+
 
 from model.domain.user import User
 
@@ -21,7 +25,7 @@ class EmotionCameraModel:
 
         self.emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
 
-        self.emotion_scores = {"Angry": 0, "Disgusted": 50, "Fearful": 25, "Happy": 100, "Neutral": 75, "Sad": 0, "Surprised": 100}
+        self.emotion_scores = {"Angry": 0, "Disgusted": 0, "Fearful": 0, "Happy": 100, "Neutral": 50, "Sad": 0, "Surprised": 100}
 
         self.emotions_text = [
             'angry',
@@ -69,6 +73,9 @@ class EmotionCameraModel:
         self.model.add(Dense(7, activation='softmax'))
 
         self.model.load_weights(emotion_model)
+
+    def get_model_type(self):
+        return 'emotion'
 
     def get_faces(self, frame, confidence_threshold=0.5):
         """Returns the box coordinates of all detected faces"""
