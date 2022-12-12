@@ -4,7 +4,7 @@ Making smart homes smarter with machine learning. This project integrates machin
 Senior Capstone project for University of Utah ECE department, Fall 2022.
 
 # Overview Diagram
-![Diagram](https://github.com/Clime-Smart-Homes/Clime/blob/READMEs-diagrams-update/clime_algorithm.jpeg)
+![Diagram](https://github.com/Clime-Smart-Homes/Clime/blob/main/clime_algorithm.jpeg)
 
 Three different modules are present:
 - *A.I. module* - Computer running computer vision models with a camera. We used a [NVIDIA Jetson Nano](https://developer.nvidia.com/embedded/jetson-nano-developer-kit) for this job.
