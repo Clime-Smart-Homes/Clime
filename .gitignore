@@ -7,3 +7,4 @@ venv/lib64
 venv/bin
 .idea
 *pycache*
+*.swp

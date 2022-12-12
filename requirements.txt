@@ -3,6 +3,6 @@ xmltodict
 python-socketio>=4,<5
 websocket-client
 pyControl4==0.3.1
-opencv-python==4.6.0.66
-numpy==1.23.3
-tensorflow==2.9.2
+numpy==1.21.6
+tensorflow
+python-decouple

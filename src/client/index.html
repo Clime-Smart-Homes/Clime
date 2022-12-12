@@ -1,0 +1,65 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Montserrat:700">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+
+<!-- Add your site or application content here -->
+<iframe name="hiddenFrame" class="hide"></iframe>
+<div class="main-menu" style="text-align: center">
+  <h1>Model Selection</h1>
+    <form action="http://192.168.0.23:8080/change_model" method="POST" target="hiddenFrame">
+      <div>
+        <input type="hidden" name="model" id="model1" value="age"/>
+      </div>
+      <div>
+        <button class="model-button">Age</button>
+      </div>
+    </form>
+    <br>
+    <br>
+    <style>
+	  .hide { position:absolute; top:-1px; left:-1px; width:1px; height:1px; }
+    </style>
+
+</form>
+    <form action="http://192.168.0.23:8080/change_model" method="POST" target="hiddenFrame">
+      <div>
+        <input type="hidden" name="model" id="model2" value="emotion"/>
+      </div>
+      <div>
+	<a href="http://www.google.com">
+        <button class="model-button">Emotion</button>
+	</a>
+      </div>
+    </form>
+</div>
+<script src="js/vendor/modernizr-3.11.2.min.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+
+</html>

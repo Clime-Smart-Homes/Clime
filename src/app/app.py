@@ -34,7 +34,7 @@ class App():
         confidence = 0
         output = 0
 
-        os.chdir('/home/hibban/Downloads/Clime/src/images')
+        os.chdir('./images')
         img_num = 0
         camera = cv2.VideoCapture("/dev/video0", cv2.CAP_V4L2)
 
@@ -53,18 +53,14 @@ class App():
             if frame.shape[1] > self.current_model.frame_width:
                 frame = image_resize(frame, width=self.current_model.frame_width)
 
-            user, value, pred_confidence, reduce_confidence = self.current_model.predict(frame)
+            user, value, pred_confidence, model_info  = self.current_model.predict(frame)
 
             tm.stop()
             fps= f'{tm.getFPS():.2f}'
     
 
-            if reduce_confidence:
-                confidence -= 10
-                output -= 5
-
             # Slowly decrease confidence and output value if user is not found
-            elif user is None:
+            if user is None:
                 confidence -= 10
                 output -= 10
 
@@ -78,9 +74,12 @@ class App():
                     confidence = pred_confidence
                     output = round((value + output) / 2) + 1
 
-                label = "Controller Value: " + str(value) + " -- Output value: " + str(output) + " -- FPS: " + str(fps)
+                elif pred_confidence < confidence - 5:
+                    confidence -= 1
 
-                draw_box(frame, user, label)
+                label = f'Output value: {str(output)}, Confidence: {str(round(confidence, 2) * 100)}'
+
+                draw_box(frame, user, label, model_info)
 
             # Display processed image
             if self.can_display:
@@ -88,7 +87,7 @@ class App():
                 num_str = str(img_num).zfill(6)
                 save_name = f"img_{num_str}.jpeg"
                 # Uncomment to save imsages
-                # cv2.imwrite(save_name, frame)
+                cv2.imwrite(save_name, frame)
                 cv2.imshow('Smart Faucet', frame)
             
             avg.append(output)

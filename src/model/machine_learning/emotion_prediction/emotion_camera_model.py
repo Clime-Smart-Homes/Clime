@@ -114,8 +114,6 @@ class EmotionCameraModel:
         user = User(start_x, start_y, end_x, end_y)
 
         face_img = frame[user.start_y: user.end_y, user.start_x: user.end_x]
-        print("X: (" + str(user.start_x) + ", " + str(user.end_x) + ")")
-        print("y: (" + str(user.start_y) + ", " + str(user.end_y) + ")")
 
         face_img = cv2.cvtColor(face_img,cv2.COLOR_BGR2GRAY)
         # image --> Input image to preprocess before passing it through our dnn for classification.
@@ -126,18 +124,12 @@ class EmotionCameraModel:
         maxindex = int(np.argmax(prediction))
         emotion_detected = self.emotion_dict[maxindex]
 
-        if emotion_detected != self.last_emotion and self.last_emotion != "":
-            self.reset_confidence = True
-
-        else:
-            self.reset_confidence = False
-
         self.last_emotion = emotion_detected
 
-        print("Emotion detected: " + emotion_detected)
-        cv2.putText(frame, emotion_detected, (user.start_x+20, user.start_y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        model_info = f'Emotion detected: {emotion_detected}'
+        # cv2.putText(frame, emotion_detected, (user.start_x+20, user.start_y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
         output_value = self.emotion_scores[emotion_detected]
-        confidence_score = prediction[0][maxindex] * 100
+        confidence_score = prediction[0][maxindex] 
 
-        return user, output_value, confidence_score, self.reset_confidence
+        return user, output_value, confidence_score, model_info

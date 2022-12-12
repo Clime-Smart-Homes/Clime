@@ -79,8 +79,6 @@ class AgeCameraModel:
                 end_x = 0 if end_x < 0 else end_x
                 end_y = 0 if end_y < 0 else end_y
 
-                print(f"x: ({start_x}, {end_x}), y: ({start_y}, {end_y})")
-
                 x = abs(end_x - start_x)
                 y = abs(end_y - start_y)
 
@@ -110,11 +108,11 @@ class AgeCameraModel:
         # Predict Age
         self.age_net.setInput(blob)
         age_preds = self.age_net.forward()
-        print("=" * 30, "Face Prediction Probabilities", "=" * 30)
-        for i in range(age_preds[0].shape[0]):
-            print(f"{self.age_intervals[i]}: {age_preds[0, i] * 100:.2f}%")
+
         i = age_preds[0].argmax()
         age = self.age_intervals[i]
         age_confidence_score = age_preds[0][i]
 
-        return user, self.age_trust[age], age_confidence_score, False
+        info = f'Predicted age: {age}'
+
+        return user, self.age_trust[age], age_confidence_score, info
