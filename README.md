@@ -12,8 +12,9 @@ Three different modules are present:
 - *Output* - Actuator that changes something in the home. In our case, it was a [smart faucet](https://github.com/Clime-Smart-Homes/Clime/tree/READMEs-diagrams-update/pcb/faucet/faucet) or standard light switch.
 
 ## Project hierarchy:
-- [src](src) All source code for connecting to Control4 director and running computer vision models.
-- [pcb](pcb) Diagrams and design documents for PCB built to convert Control4 outlet dimmer to 0-10V DC for faucet motors.
+- [*src*](src) - All source code for connecting to Control4 director and running computer vision models.
+- [*pcb*](pcb) - Diagrams and design documents for PCB built to convert Control4 outlet dimmer to 0-10V DC for faucet motors.
+- [*venv*](venv) - Virtual Python 3.7 environment that should make setup easier.
 
 ## Team:
 - Hibban Butt
