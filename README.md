@@ -9,7 +9,7 @@ Senior Capstone project for University of Utah ECE department, Fall 2022.
 Three different modules are present:
 - *A.I. module* - Computer running computer vision models with a camera. We used a [NVIDIA Jetson Nano](https://developer.nvidia.com/embedded/jetson-nano-developer-kit) for this job.
 - *Controller* - Smart home controller, here it is the [Control4 Controller](https://www.control4.com/solutions/products/controllers/).
-- *Output* - Actuator that changes something in the home. In our case, it was a [smart faucet](https://github.com/Clime-Smart-Homes/Clime/tree/READMEs-diagrams-update/pcb/faucet/faucet) or standard light switch.
+- *Output* - Actuator that changes something in the home. In our case, it was a [smart faucet](https://github.com/Clime-Smart-Homes/Clime/tree/main/pcb/faucet/faucet) or standard light switch.
 
 ## Project hierarchy:
 - [*src*](src) - All source code for connecting to Control4 director and running computer vision models.
